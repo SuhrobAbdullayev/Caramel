@@ -4,14 +4,14 @@ from data.answers import answers
 
 back_text = {
     "uz": {
-        "main": "Bosh menyu",
+        "main": "🏠 Bosh menyu",
         "pass": "O`tkazib yuborish",
-        "back": "Orqaga"
+        "back": "🔙 Orqaga"
     },
     "ru": {
-        "main": "Главное меню",
+        "main": "🏠 Главное меню",
         "pass": "Пропустить",
-        "back": "Назад"
+        "back": "🔙 Назад"
     }
 }
 
@@ -133,7 +133,7 @@ terra_locations_buttons = {
     },
     "ru": {
         "pahlavon2": "Пахлавон Махмуд 220A",
-        "amudaryo": "Амударё кочаси 19",
+        "amudaryo": "Улица Аму-Дарьи, 19",
         "elobod": "Элобод 112/1",
     }
 }

@@ -224,10 +224,23 @@ async def handle_about_you(message: types.Message, state: FSMContext):
         await MenuStates.branches.set()
         return
     await state.update_data(about_you=message.text)
+    await message.answer(answers[lang]["ask_phone"], reply_markup=get_back_button(lang))
+    await MenuStates.phone_number.set()
+
+@dp.message_handler(state=MenuStates.phone_number)
+async def handle_phone_number(message: types.Message, state: FSMContext):
+    user = await db.select_user(telegram_id=message.from_user.id)
+    lang = user["lang"]
+
+    if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+        await MenuStates.branches.set()
+        return
+
+    await state.update_data(phone_number=message.text)
+
     await message.answer(answers[lang]["ask_photo"], reply_markup=get_back_button(lang))
     await MenuStates.photo.set()
-
-
 
 @dp.message_handler(content_types=types.ContentType.PHOTO, state=MenuStates.photo)
 async def handle_photo(message: types.Message, state: FSMContext):
@@ -240,22 +253,42 @@ async def handle_photo(message: types.Message, state: FSMContext):
     data = await state.get_data()
 
     # Generate confirmation text directly here
-    confirmation_text = (
-        f"👤 Ism, familiya, otasining ismi: {data.get('full_name', '-')}\n"
-        f"🚻 Jinsi: {data.get('gender', '-')}\n"
-        f"🎂 Tug'ilgan sana: {data.get('dob', '-')}\n"
-        f"🏠 Yashash manzili: {data.get('address', '-')}\n"
-        f"💰 Istalgan maosh: {data.get('salary', '-')}\n"
-        f"💍 Oilaviy holati: {data.get('marital_status', '-')}\n"
-        f"💼 Tajriba: {data.get('experience', '-')}\n"
-        f"🌐 Chet tillari: {data.get('languages', '-')}\n"
-        f"🚘 Haydovchilik guvohnomasi: {data.get('driver_license', '-')}\n"
-        f"📝 O'zingiz haqingizda: {data.get('about_you', '-')}\n"
-        f"⏰ Ish vaqti: {data.get('working_hours', '-')}\n"
-        f"🏢 Lavozim: {data.get('position', '-')}\n"
-        f"📍 Filial: {data.get('location', '-')}\n"
-        f"🏭 Bo'lim: {data.get('place', '-')}"
-    )
+    if lang == "uz":
+        confirmation_text = (
+            f"👤 Ism, familiya, otasining ismi: {data.get('full_name', '-')}\n"
+            f"🚻 Jinsi: {data.get('gender', '-')}\n"
+            f"🎂 Tug'ilgan sana: {data.get('dob', '-')}\n"
+            f"🏠 Yashash manzili: {data.get('address', '-')}\n"
+            f"💰 Istalgan maosh: {data.get('salary', '-')}\n"
+            f"💍 Oilaviy holati: {data.get('marital_status', '-')}\n"
+            f"💼 Tajriba: {data.get('experience', '-')}\n"
+            f"🌐 Chet tillari: {data.get('languages', '-')}\n"
+            f"🚘 Haydovchilik guvohnomasi: {data.get('driver_license', '-')}\n"
+            f"📝 O'zingiz haqingizda: {data.get('about_you', '-')}\n"
+            f"⏰ Ish vaqti: {data.get('working_hours', '-')}\n"
+            f"🏢 Lavozim: {data.get('position', '-')}\n"
+            f"📍 Filial: {data.get('location', '-')}\n"
+            f"🏭 Bo'lim: {data.get('place', '-')}\n"
+            f"📱 Telefon raqami: {data.get('phone_number', '-')}\n"
+        )
+    else:
+        confirmation_text = (
+            f"👤 ФИО: {data.get('full_name', '-')}\n"
+            f"🚻 Пол: {data.get('gender', '-')}\n"
+            f"🎂 Дата рождения: {data.get('dob', '-')}\n"
+            f"🏠 Адрес проживания: {data.get('address', '-')}\n"
+            f"💰 Желаемая зарплата: {data.get('salary', '-')}\n"
+            f"💍 Семейное положение: {data.get('marital_status', '-')}\n"
+            f"💼 Опыт работы: {data.get('experience', '-')}\n"
+            f"🌐 Языки: {data.get('languages', '-')}\n"
+            f"🚘 Водительские права: {data.get('driver_license', '-')}\n"
+            f"📝 О себе: {data.get('about_you', '-')}\n"
+            f"⏰ График работы: {data.get('working_hours', '-')}\n"
+            f"🏢 Должность: {data.get('position', '-')}\n"
+            f"📍 Филиал: {data.get('location', '-')}\n"
+            f"🏭 Отдел: {data.get('place', '-')}\n"
+            f"📱 Номер телефона: {data.get('phone_number', '-')}\n"
+        )
 
     await message.answer(answers[lang]["check_info"])
 
@@ -284,11 +317,17 @@ async def process_confirm(callback: types.CallbackQuery, state: FSMContext):
     lang = user["lang"]
 
     await bot.copy_message(
-        chat_id=1029949773,             # Admin or HR chat
-        from_chat_id=callback.message.chat.id,  # User's chat
-        message_id=callback.message.message_id  # The message they clicked confirm on
+        chat_id=1029949773,
+        from_chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id
+    )
+    await bot.copy_message(
+        chat_id=1051264616,
+        from_chat_id=callback.message.chat.id,
+        message_id=callback.message.message_id
     )
     await callback.message.answer(answers[lang]["done"], reply_markup=get_main_menu(lang))
+    await callback.message.delete()
     try:
         await state.finish()
     except: pass
@@ -299,6 +338,7 @@ async def process_cancel(callback: types.CallbackQuery, state: FSMContext):
     lang = user["lang"]
 
     await callback.message.answer(answers[lang]["welcome"], reply_markup=get_main_menu(lang))
+    await callback.message.delete()
     try:
         await state.finish()
     except: pass

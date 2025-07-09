@@ -25,6 +25,7 @@ class MenuStates(StatesGroup):
     languages = State()
     driver_license = State()
     about_you = State()
+    phone_number = State()
     photo = State()
     confirm = State()
 
@@ -88,7 +89,7 @@ async def contact_us(message: types.Message):
 async def vacancies(message: types.Message):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
-    await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+    await message.answer(answers[lang]["choose_branch"], reply_markup=get_vacancies_menu(lang))
     await MenuStates.branches.set()
 
 # branches will be sent here
@@ -106,19 +107,19 @@ async def caramel_vacancies(message: types.Message, state: FSMContext):
 
     if message.text == vacancies_menu_buttons["uz"]["caramel"] or message.text == vacancies_menu_buttons["ru"]["caramel"]:
         await state.update_data(place = vacancies_menu_buttons[lang]["caramel"])
-        await message.answer(answers[lang]["choose_branch"], reply_markup=get_caramel_locations_menu(lang))
+        await message.answer(answers[lang]["choose_location"], reply_markup=get_caramel_locations_menu(lang))
         await state.update_data(branch = "caramel")
     elif message.text == vacancies_menu_buttons["uz"]["production"] or message.text == vacancies_menu_buttons["ru"]["production"]:
         await state.update_data(place = vacancies_menu_buttons[lang]["production"])
-        await message.answer(answers[lang]["choose_branch"], reply_markup=get_production_locations_menu(lang))
+        await message.answer(answers[lang]["choose_location"], reply_markup=get_production_locations_menu(lang))
         await state.update_data(branch = "production")
     elif message.text == vacancies_menu_buttons["uz"]["office"] or message.text == vacancies_menu_buttons["ru"]["office"]:
         await state.update_data(place = vacancies_menu_buttons[lang]["office"])
-        await message.answer(answers[lang]["choose_branch"], reply_markup=get_production_locations_menu(lang))
+        await message.answer(answers[lang]["choose_location"], reply_markup=get_production_locations_menu(lang))
         await state.update_data(branch = "office")
     elif message.text == vacancies_menu_buttons["uz"]["terra"] or message.text == vacancies_menu_buttons["ru"]["terra"]:
         await state.update_data(place = vacancies_menu_buttons[lang]["terra"])
-        await message.answer(answers[lang]["choose_branch"], reply_markup=get_terra_locations_menu(lang))
+        await message.answer(answers[lang]["choose_location"], reply_markup=get_terra_locations_menu(lang))
         await state.update_data(branch = "terra")
     await MenuStates.locations.set()
 
@@ -204,15 +205,11 @@ async def choose_location(message: types.Message, state: FSMContext):
     # Check for office locations
     elif branch == "office" and (message.text in production_office_locations_buttons["uz"].values() or message.text in production_office_locations_buttons["ru"].values()):
         await state.update_data(location=message.text)
-        await message.answer(answers[lang]["choose_position"], reply_markup=get_production_vacancies_menu(lang))
+        await message.answer(answers[lang]["choose_position"], reply_markup=get_office_vacancies_buttons(lang))
 
     # Check for terra locations
     elif branch == "terra" and (message.text in terra_locations_buttons["uz"].values() or message.text in terra_locations_buttons["ru"].values()):
         await state.update_data(location=message.text)
         await message.answer(answers[lang]["choose_position"], reply_markup=get_terra_vacancies_menu(lang))
     await MenuStates.positions.set()
-
-
-
-
 
