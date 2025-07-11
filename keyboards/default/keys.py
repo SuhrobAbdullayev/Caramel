@@ -44,6 +44,27 @@ def get_main_menu(lang):
 
 # ------------------------------------ END OF MAIN MENU ------------------------------------
 
+caramel_vs_terra_buttons = {
+    "uz": {
+        "caramel": "Caramel cafe & bakery",
+        "terra": "Terra cafeteria",
+    },
+    "ru": {
+        "caramel": "Карамель кафе и пекарня",
+        "terra": "Кафе Терра",
+    }
+}
+
+def get_caramel_vs_terra_menu(lang):
+    t = caramel_vs_terra_buttons[lang]
+    b = back_text[lang]
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.add(KeyboardButton(t["caramel"]), KeyboardButton(t["terra"]))
+    markup.row(KeyboardButton(b["back"]))
+
+    return markup
+
 # ----------------------------------- Vacancies button -----------------------------------
 
 vacancies_menu_buttons = {
@@ -61,13 +82,23 @@ vacancies_menu_buttons = {
     }
 }
 
-def get_vacancies_menu(lang):
+def get_caramel_branches_menu(lang):
     t = vacancies_menu_buttons[lang]
     b = back_text[lang]
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.add(KeyboardButton(t["caramel"]), KeyboardButton(t["production"]))
-    markup.add(KeyboardButton(t["terra"]), KeyboardButton(t["office"]))
+    markup.add(KeyboardButton(t["office"]))
+    markup.row(KeyboardButton(b["back"]))
+
+    return markup
+
+def get_terra_branches_menu(lang):
+    t = vacancies_menu_buttons[lang]
+    b = back_text[lang]
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.add(KeyboardButton(t["terra"]))
     markup.row(KeyboardButton(b["back"]))
 
     return markup
@@ -275,7 +306,7 @@ def get_terra_vacancies_menu(lang):
 work_time = {
     "uz": {
         "kunduzgi": "8:00 - 16:00 (1-smena)",
-        "kechki": "16:00 - 23:00 (2-smena)",
+        "kechki": "16:00 - 00:00 (2-smena)",
         "toliq": "Toliq ish kuni",
         "harqanday": "Har qanday grafik",
     },
@@ -287,7 +318,7 @@ work_time = {
     }
 }
 
-def get_work_time_menu(lang):
+def get_caramel_work_time_menu(lang):
     t = work_time[lang]
     b = back_text[lang]
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -298,7 +329,31 @@ def get_work_time_menu(lang):
 
     return markup
 
+work_time2 = {
+    "uz": {
+        "kunduzgi": "8:00 - 18:00 (1-smena)",
+        "kechki": "17:00 - 03:00 (2-smena)",
+        "toliq": "Toliq ish kuni",
+        "harqanday": "Har qanday grafik",
+    },
+    "ru": {
+        "kunduzgi": "8:00 - 16:00 (1-смена)",
+        "kechki": "16:00 - 23:00 (2-смена)",
+        "toliq": "Полный рабочий день",
+        "harqanday": "Любой график",
+    }
+}
 
+def get_tera_work_time_menu(lang):
+    t = work_time2[lang]
+    b = back_text[lang]
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    markup.add(KeyboardButton(t["kunduzgi"]), KeyboardButton(t["kechki"]))
+    markup.add(KeyboardButton(t["toliq"]), KeyboardButton(t["harqanday"]))
+    markup.row(KeyboardButton(b["main"]), KeyboardButton(b["back"]))
+
+    return markup
 # ------------------------------------ END OF Working time ----------------------------------------------
 
 

@@ -4,8 +4,9 @@ from aiogram.dispatcher import FSMContext
 from data.answers import answers
 from handlers.users.start import MenuStates
 from keyboards.default.keys import caramel_vacancies_buttons, office_vacancies_buttons, production_vacancies_buttons, \
-    terra_vacancies_buttons, get_work_time_menu, get_vacancies_menu, work_time, get_main_menu, back_text, get_gender, \
-    gender_text, get_back_button, get_confirm_keyboard
+    terra_vacancies_buttons, work_time, get_main_menu, back_text, get_gender, \
+    get_back_button, get_confirm_keyboard, get_caramel_vs_terra_menu, get_tera_work_time_menu, \
+    get_caramel_work_time_menu
 from loader import dp, db, bot
 
 
@@ -50,14 +51,19 @@ async def handle_vacancies(message: types.Message, state: FSMContext):
     lang = user["lang"]
     key = keyFinder(message.text)
     if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
-        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
         await MenuStates.branches.set()
         return
     if key:
         position_info = await db.get_position(key, lang)
         if position_info:
             await message.answer(position_info[lang])
-            await message.answer(answers[lang]["working_hours"], reply_markup=get_work_time_menu(lang))
+            data = await state.get_data()
+            branch = data.get("branch")
+            if branch == "terra":
+                await message.answer(answers[lang]["working_hours"], reply_markup=get_tera_work_time_menu(lang))
+            else:
+                await message.answer(answers[lang]["working_hours"], reply_markup=get_caramel_work_time_menu(lang))
             await state.update_data(position=message.text)
             await MenuStates.working_hours.set()
         else:
@@ -69,26 +75,11 @@ async def handle_vacancies(message: types.Message, state: FSMContext):
 async def handle_working_hours(message: types.Message, state: FSMContext):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
-    position = (await state.get_data()).get("position")
 
     if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
-        key = keyFinder(position)
-        if key:
-            position_info = await db.get_position(key, lang)
-            if position_info:
-                await message.answer(position_info[lang])
-                await message.answer(answers[lang]["working_hours"], reply_markup=get_work_time_menu(lang))
-                await state.update_data(position=message.text)
-                await MenuStates.working_hours.set()
-            else:
-                await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
-                await MenuStates.branches.set()
-                return
-        else:
-            await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
-            await MenuStates.branches.set()
-            return
-        await MenuStates.positions.set()
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
+        await MenuStates.branches.set()
+        return
     elif message.text in [back_text["uz"]["main"], back_text["ru"]["main"]]:
         await message.answer(answers[lang]["welcome"], reply_markup=get_main_menu(lang))
         try:
@@ -110,7 +101,7 @@ async def handle_full_name(message: types.Message, state: FSMContext):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
     if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
-        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
         await MenuStates.branches.set()
         return
 
@@ -124,7 +115,7 @@ async def handle_gender(message: types.Message, state: FSMContext):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
     if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
-        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
         await MenuStates.branches.set()
         return
     await state.update_data(gender=message.text)
@@ -136,7 +127,7 @@ async def handle_dob(message: types.Message, state: FSMContext):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
     if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
-        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
         await MenuStates.branches.set()
         return
     await state.update_data(dob=message.text)
@@ -148,7 +139,7 @@ async def handle_address(message: types.Message, state: FSMContext):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
     if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
-        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
         await MenuStates.branches.set()
         return
     await state.update_data(address=message.text)
@@ -160,7 +151,7 @@ async def handle_salary(message: types.Message, state: FSMContext):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
     if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
-        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
         await MenuStates.branches.set()
         return
     await state.update_data(salary=message.text)
@@ -172,7 +163,7 @@ async def handle_marital_status(message: types.Message, state: FSMContext):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
     if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
-        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
         await MenuStates.branches.set()
         return
     await state.update_data(marital_status=message.text)
@@ -184,7 +175,7 @@ async def handle_experience(message: types.Message, state: FSMContext):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
     if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
-        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
         await MenuStates.branches.set()
         return
     await state.update_data(experience=message.text)
@@ -196,7 +187,7 @@ async def handle_languages(message: types.Message, state: FSMContext):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
     if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
-        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
         await MenuStates.branches.set()
         return
     await state.update_data(languages=message.text)
@@ -208,7 +199,7 @@ async def handle_driver_license(message: types.Message, state: FSMContext):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
     if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
-        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
         await MenuStates.branches.set()
         return
     await state.update_data(driver_license=message.text)
@@ -220,7 +211,7 @@ async def handle_about_you(message: types.Message, state: FSMContext):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
     if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
-        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
         await MenuStates.branches.set()
         return
     await state.update_data(about_you=message.text)
@@ -233,7 +224,7 @@ async def handle_phone_number(message: types.Message, state: FSMContext):
     lang = user["lang"]
 
     if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
-        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
         await MenuStates.branches.set()
         return
 
@@ -307,7 +298,7 @@ async def handle_photo_back(message: types.Message, state: FSMContext):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
 
-    await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_vacancies_menu(lang))
+    await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
     await MenuStates.branches.set()
 
 

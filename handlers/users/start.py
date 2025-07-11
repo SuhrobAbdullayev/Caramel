@@ -3,14 +3,13 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.builtin import CommandStart
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from data.answers import answers
 from keyboards.default.keys import *
 from loader import dp, db, bot
 
 class MenuStates(StatesGroup):
     vacancies = State()
+    caramel_vs_terra = State()
     branches = State()
     locations = State()
     positions = State()
@@ -89,12 +88,12 @@ async def contact_us(message: types.Message):
 async def vacancies(message: types.Message):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
-    await message.answer(answers[lang]["choose_branch"], reply_markup=get_vacancies_menu(lang))
-    await MenuStates.branches.set()
+    await message.answer(answers[lang]["choose_branch"], reply_markup=get_caramel_vs_terra_menu(lang))
+    await MenuStates.caramel_vs_terra.set()
 
-# branches will be sent here
-@dp.message_handler(state=MenuStates.branches)
-async def caramel_vacancies(message: types.Message, state: FSMContext):
+# caramel vs terra button answers
+@dp.message_handler(state=MenuStates.caramel_vs_terra)
+async def caramel_vs_terra(message: types.Message, state: FSMContext):
     user = await db.select_user(telegram_id=message.from_user.id)
     lang = user["lang"]
 
@@ -103,6 +102,24 @@ async def caramel_vacancies(message: types.Message, state: FSMContext):
         try:
             await state.finish()
         except: pass
+        return
+    if message.text == caramel_vs_terra_buttons["uz"]["caramel"] or message.text == caramel_vs_terra_buttons["ru"]["caramel"]:
+        await message.answer(answers[lang]["choose_workplace"], reply_markup=get_caramel_branches_menu(lang))
+        await MenuStates.branches.set()
+    elif message.text == caramel_vs_terra_buttons["uz"]["terra"] or message.text == caramel_vs_terra_buttons["ru"]["terra"]:
+        await message.answer(answers[lang]["choose_workplace"], reply_markup=get_terra_branches_menu(lang))
+        await MenuStates.branches.set()
+
+
+# branches will be sent here
+@dp.message_handler(state=MenuStates.branches)
+async def caramel_vacancies(message: types.Message, state: FSMContext):
+    user = await db.select_user(telegram_id=message.from_user.id)
+    lang = user["lang"]
+
+    if message.text == back_text["uz"]["back"] or message.text == back_text["ru"]["back"]:
+        await message.answer(answers[lang]["choose_branch"], reply_markup=get_caramel_vs_terra_menu(lang))
+        await MenuStates.caramel_vs_terra.set()
         return
 
     if message.text == vacancies_menu_buttons["uz"]["caramel"] or message.text == vacancies_menu_buttons["ru"]["caramel"]:
@@ -133,13 +150,12 @@ async def choose_location(message: types.Message, state: FSMContext):
     branch = data.get("branch")
 
     if message.text == back_text["uz"]["back"] or message.text == back_text["ru"]["back"]:
-        await message.answer(answers[lang]["choose_branch"], reply_markup=get_vacancies_menu(lang))
-        await MenuStates.branches.set()
+        await message.answer(answers[lang]["choose_branch"], reply_markup=get_caramel_vs_terra_menu(lang))
+        await MenuStates.caramel_vs_terra.set()
         return
 
 # HERE I NEED TO WRITE SENDING LOCATIONS
     if message.text == caramel_locations_buttons["uz"]["abulgazi"] or message.text == caramel_locations_buttons["ru"]["abulgazi"]:
-        await message.answer(answers[lang]["choose_position"], reply_markup=get_caramel_vacancies_menu(lang))
         await bot.send_venue(
             chat_id=message.chat.id,
             latitude= 41.55929523566943,
@@ -148,7 +164,6 @@ async def choose_location(message: types.Message, state: FSMContext):
             address=message.text,
         )
     elif message.text == caramel_locations_buttons["uz"]["pahlavon"] or message.text == caramel_locations_buttons["ru"]["pahlavon"]:
-        await message.answer(answers[lang]["choose_position"], reply_markup=get_caramel_vacancies_menu(lang))
         await bot.send_venue(
             chat_id=message.chat.id,
             latitude= 41.556876078474666,
@@ -157,7 +172,6 @@ async def choose_location(message: types.Message, state: FSMContext):
             address=message.text,
         )
     elif message.text == caramel_locations_buttons["uz"]["xorazmiy"] or message.text == caramel_locations_buttons["ru"]["xorazmiy"]:
-        await message.answer(answers[lang]["choose_position"], reply_markup=get_caramel_vacancies_menu(lang))
         await bot.send_venue(
             chat_id=message.chat.id,
             latitude= 41.55647102348824,
@@ -166,7 +180,6 @@ async def choose_location(message: types.Message, state: FSMContext):
             address=message.text,
         )
     elif message.text == terra_locations_buttons["uz"]["pahlavon2"] or message.text == terra_locations_buttons["ru"]["pahlavon2"]:
-        await message.answer(answers[lang]["choose_position"], reply_markup=get_caramel_vacancies_menu(lang))
         await bot.send_venue(
             chat_id=message.chat.id,
             latitude= 41.562841105636316,
@@ -175,7 +188,6 @@ async def choose_location(message: types.Message, state: FSMContext):
             address=message.text,
         )
     elif message.text == terra_locations_buttons["uz"]["amudaryo"] or message.text == terra_locations_buttons["ru"]["amudaryo"]:
-        await message.answer(answers[lang]["choose_position"], reply_markup=get_caramel_vacancies_menu(lang))
         await bot.send_venue(
             chat_id=message.chat.id,
             latitude= 41.558802844127435,
@@ -184,7 +196,6 @@ async def choose_location(message: types.Message, state: FSMContext):
             address=message.text,
         )
     elif message.text == terra_locations_buttons["uz"]["elobod"] or message.text == terra_locations_buttons["ru"]["elobod"]:
-        await message.answer(answers[lang]["choose_position"], reply_markup=get_caramel_vacancies_menu(lang))
         await bot.send_venue(
             chat_id=message.chat.id,
             latitude= 41.37949172076444,
