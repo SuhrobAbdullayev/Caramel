@@ -85,6 +85,11 @@ async def handle_working_hours(message: types.Message, state: FSMContext):
         try:
             await state.finish()
         except: pass
+        return
+    elif message.text in [back_text["uz"]["boshqa"], back_text["ru"]["boshqa"]]:
+        await message.answer(answers[lang]["another_working_hours"], reply_markup=get_back_button(lang))
+        await MenuStates.another_hours.set()
+        return
     else:
         if message.text in work_time[lang].values():
             await state.update_data(working_hours=message.text)
@@ -95,6 +100,20 @@ async def handle_working_hours(message: types.Message, state: FSMContext):
             try:
                 await state.finish()
             except: pass
+
+@dp.message_handler(state=MenuStates.another_hours)
+async def handle_another_hours(message: types.Message, state: FSMContext):
+    user = await db.select_user(telegram_id=message.from_user.id)
+    lang = user["lang"]
+
+    if message.text in [back_text["uz"]["back"], back_text["ru"]["back"]]:
+        await message.answer(answers[lang]["choose_vacancy"], reply_markup=get_caramel_vs_terra_menu(lang))
+        await MenuStates.branches.set()
+        return
+
+    await state.update_data(working_hours=message.text)
+    await message.answer(answers[lang]["ask_fullname"], reply_markup=get_back_button(lang))
+    await MenuStates.full_name.set()
 
 @dp.message_handler(state=MenuStates.full_name)
 async def handle_full_name(message: types.Message, state: FSMContext):

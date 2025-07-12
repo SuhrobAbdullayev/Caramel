@@ -14,6 +14,7 @@ class MenuStates(StatesGroup):
     locations = State()
     positions = State()
     working_hours = State()
+    another_hours = State()
     full_name = State()
     gender = State()
     dob = State()

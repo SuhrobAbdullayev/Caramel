@@ -160,12 +160,12 @@ terra_locations_buttons = {
     "uz": {
         "pahlavon2": "Pahlavon Mahmud 220A",
         "amudaryo": "Amudaryo ko'chasi 19",
-        "elobod": "Elobod 112/1",
+        "elobod": "Xiva Elobod 112/1",
     },
     "ru": {
         "pahlavon2": "Пахлавон Махмуд 220A",
         "amudaryo": "Улица Аму-Дарьи, 19",
-        "elobod": "Элобод 112/1",
+        "elobod": "Хива Элобод 112/1",
     }
 }
 def get_terra_locations_menu(lang):
@@ -190,6 +190,7 @@ caramel_vacancies_buttons = {
         "barista": "Barista",
         "farrosh": "Farrosh",
         "sotuvchi": "Sotuvchi",
+        "oshpaz": "Oshpaz",
         "kassir": "Kassir",
     },
     "ru": {
@@ -197,6 +198,7 @@ caramel_vacancies_buttons = {
         "barista": "Бариста",
         "farrosh": "Уборщик",
         "sotuvchi": "Продавец",
+        "oshpaz": "Повар",
         "kassir": "Кассир",
     }
 }
@@ -208,7 +210,7 @@ def get_caramel_vacancies_menu(lang):
 
     markup.add(KeyboardButton(t["afitsant"]), KeyboardButton(t["barista"]))
     markup.add(KeyboardButton(t["farrosh"]), KeyboardButton(t["sotuvchi"]))
-    markup.add(KeyboardButton(t["kassir"]))
+    markup.add(KeyboardButton(t["oshpaz"]), KeyboardButton(t["kassir"]))
     markup.row(KeyboardButton(b["back"]))
 
     return markup
@@ -309,12 +311,14 @@ work_time = {
         "kechki": "16:00 - 00:00 (2-smena)",
         "toliq": "Toliq ish kuni",
         "harqanday": "Har qanday grafik",
+        "boshqa": "Boshqa ish vaqti",
     },
     "ru": {
         "kunduzgi": "8:00 - 16:00 (1-смена)",
         "kechki": "16:00 - 23:00 (2-смена)",
         "toliq": "Полный рабочий день",
         "harqanday": "Любой график",
+        "boshqa": "Другое время работы",
     }
 }
 
@@ -325,6 +329,7 @@ def get_caramel_work_time_menu(lang):
 
     markup.add(KeyboardButton(t["kunduzgi"]), KeyboardButton(t["kechki"]))
     markup.add(KeyboardButton(t["toliq"]), KeyboardButton(t["harqanday"]))
+    markup.add(KeyboardButton(t["boshqa"]))
     markup.row(KeyboardButton(b["main"]), KeyboardButton(b["back"]))
 
     return markup
