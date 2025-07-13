@@ -282,12 +282,12 @@ def get_production_vacancies_menu(lang):
 
 terra_vacancies_buttons = {
     "uz": {
-        "barista": "Barista",
-        "farrosh": "Farrosh",
+        "barista_t": "🔹Barista",
+        "farrosh_t": "🔹Farrosh",
     },
     "ru": {
-        "barista": "Бариста",
-        "farrosh": "Уборщик",
+        "barista_t": "🔹Бариста",
+        "farrosh_t": "🔹Уборщик",
     }
 }
 
@@ -296,7 +296,7 @@ def get_terra_vacancies_menu(lang):
     b = back_text[lang]
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
-    markup.add(KeyboardButton(t["barista"]), KeyboardButton(t["farrosh"]))
+    markup.add(KeyboardButton(t["barista_t"]), KeyboardButton(t["farrosh_t"]))
     markup.row(KeyboardButton(b["back"]))
 
     return markup
@@ -315,7 +315,7 @@ work_time = {
     },
     "ru": {
         "kunduzgi": "8:00 - 16:00 (1-смена)",
-        "kechki": "16:00 - 23:00 (2-смена)",
+        "kechki": "16:00 - 00:00 (2-смена)",
         "toliq": "Полный рабочий день",
         "harqanday": "Любой график",
         "boshqa": "Другое время работы",
@@ -342,8 +342,8 @@ work_time2 = {
         "harqanday": "Har qanday grafik",
     },
     "ru": {
-        "kunduzgi": "8:00 - 16:00 (1-смена)",
-        "kechki": "16:00 - 23:00 (2-смена)",
+        "kunduzgi": "8:00 - 18:00 (1-смена)",
+        "kechki": "17:00 - 03:00 (2-смена)",
         "toliq": "Полный рабочий день",
         "harqanday": "Любой график",
     }

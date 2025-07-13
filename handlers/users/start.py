@@ -105,9 +105,11 @@ async def caramel_vs_terra(message: types.Message, state: FSMContext):
         except: pass
         return
     if message.text == caramel_vs_terra_buttons["uz"]["caramel"] or message.text == caramel_vs_terra_buttons["ru"]["caramel"]:
+        await bot.copy_message(from_chat_id=-1001277054156, chat_id=message.from_user.id, message_id=254)
         await message.answer(answers[lang]["choose_workplace"], reply_markup=get_caramel_branches_menu(lang))
         await MenuStates.branches.set()
     elif message.text == caramel_vs_terra_buttons["uz"]["terra"] or message.text == caramel_vs_terra_buttons["ru"]["terra"]:
+        await bot.copy_message(from_chat_id=-1001277054156, chat_id=message.from_user.id, message_id=253)
         await message.answer(answers[lang]["choose_workplace"], reply_markup=get_terra_branches_menu(lang))
         await MenuStates.branches.set()
 
